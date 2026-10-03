@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b1026">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Cuentos">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="styles.css">
+  <title>Cuentos para dormir</title>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Cuentos para dormir</h1>
+      <p id="estado" role="status"></p>
+    </header>
+    <ul id="lista"></ul>
+  </main>
+
+  <section id="reproductor" hidden aria-label="Reproductor">
+    <h2 id="titulo-actual"></h2>
+    <input id="progreso" type="range" min="0" max="100" value="0" step="1" aria-label="Posición">
+    <div class="tiempos"><span id="transcurrido">0:00</span><span id="restante">0:00</span></div>
+    <div class="controles">
+      <button id="atras" aria-label="Retroceder 15 segundos">−15</button>
+      <button id="play" class="principal" aria-label="Reproducir">▶</button>
+      <button id="adelante" aria-label="Avanzar 15 segundos">+15</button>
+    </div>
+    <div id="modos" role="radiogroup" aria-label="Cuándo parar">
+      <button data-modo="fin">Fin del cuento</button>
+      <button data-modo="15">15 min</button>
+      <button data-modo="30">30 min</button>
+      <button data-modo="45">45 min</button>
+      <button data-modo="seguido">Sin parar</button>
+    </div>
+    <p id="aviso-temporizador"></p>
+  </section>
+
+  <audio id="audio" preload="metadata" crossorigin="anonymous"></audio>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
