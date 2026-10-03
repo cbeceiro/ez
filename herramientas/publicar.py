@@ -25,7 +25,7 @@ DEMO = RAIZ / "app" / "demo"
 BUCKET = "cuentos-audio"
 KBPS = 128
 HZ = 44100
-VELOCIDAD = 0.85  # 1.0 es la velocidad normal de la voz; ElevenLabs admite de 0.7 a 1.2
+MODELO = "eleven_v4"  # entiende etiquetas de estilo en el texto, como [whispering]; no tiene control de velocidad
 PAUSA = 1.2  # segundos de silencio entre párrafos
 
 
@@ -108,7 +108,7 @@ def voz_elevenlabs(narracion, clave, voz, modelo):
         cuerpo = {
             "text": parrafo,
             "model_id": modelo,
-            "voice_settings": {"stability": 0.6, "similarity_boost": 0.8, "speed": VELOCIDAD},
+            "voice_settings": {"stability": 0.6, "similarity_boost": 0.8},
         }
         # El contexto de los párrafos vecinos mantiene la entonación entre peticiones.
         if i > 0:
@@ -173,13 +173,13 @@ def publicar(cuentos, forzar):
     if faltan:
         sys.exit(f"Faltan variables en .env: {', '.join(faltan)}")
     voz = os.environ["ELEVENLABS_VOICE_ID"]
-    modelo = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
+    modelo = os.environ.get("ELEVENLABS_MODEL", MODELO)
     supa = Supabase(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SECRET_KEY"])
     publicados = supa.publicados()
 
     for c in cuentos:
         # La huella incluye los ajustes de voz: cambiar cualquiera de ellos regenera el audio.
-        ajustes = f"{voz}|{modelo}|{VELOCIDAD}|{PAUSA}"
+        ajustes = f"{voz}|{modelo}|{PAUSA}"
         huella = hashlib.sha256(f"{ajustes}|{c['narracion']}".encode()).hexdigest()[:12]
         datos = {"titulo": c["titulo"], "descripcion": c["descripcion"], "orden": c["orden"]}
         anterior = publicados.pop(c["slug"], None)
