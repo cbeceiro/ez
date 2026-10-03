@@ -28,6 +28,10 @@ cuentos/*.md  →  herramientas/publicar.py  →  Supabase (tabla cuentos + buck
 
 Solo se genera audio para los cuentos nuevos o cuyo texto ha cambiado. La app los muestra la próxima vez que se abra.
 
+## Borrar un cuento
+
+Borra su fichero de `cuentos/` y vuelve a ejecutar el script: la carpeta manda, así que lo que ya no tiene fichero se retira de la app junto con su audio.
+
 ## Configuración (una vez)
 
 - Copia `.env.example` a `.env` y rellena las claves de ElevenLabs y Supabase.

@@ -2,7 +2,7 @@
 """Publica los cuentos de cuentos/*.md: genera el audio con la voz clonada y lo sube a Supabase.
 
 Uso:
-  python3 herramientas/publicar.py           publica los cuentos nuevos o modificados
+  python3 herramientas/publicar.py           publica los cuentos nuevos o modificados y retira los borrados
   python3 herramientas/publicar.py --forzar  regenera el audio de todos
   python3 herramientas/publicar.py --demo    prueba local con la voz del Mac (sin claves ni Supabase)
 """
@@ -108,9 +108,9 @@ class Supabase:
             sys.exit(f"Supabase respondió {r.status_code} en {ruta}: {r.text[:300]}")
         return r
 
-    def huellas(self):
-        filas = self._pedir("GET", "/rest/v1/cuentos", params={"select": "slug,texto_hash"}).json()
-        return {f["slug"]: f["texto_hash"] for f in filas}
+    def publicados(self):
+        filas = self._pedir("GET", "/rest/v1/cuentos", params={"select": "slug,texto_hash,audio_url"}).json()
+        return {f["slug"]: f for f in filas}
 
     def subir_audio(self, nombre, audio):
         self._pedir(
@@ -133,6 +133,13 @@ class Supabase:
     def actualizar(self, slug, campos):
         self._pedir("PATCH", "/rest/v1/cuentos", params={"slug": f"eq.{slug}"}, json=campos)
 
+    def borrar_audio(self, url):
+        self._pedir("DELETE", f"/storage/v1/object/{BUCKET}/{url.rsplit('/', 1)[-1]}")
+
+    def borrar(self, fila):
+        self._pedir("DELETE", "/rest/v1/cuentos", params={"slug": f"eq.{fila['slug']}"})
+        self.borrar_audio(fila["audio_url"])
+
 
 def publicar(cuentos, forzar):
     cargar_env()
@@ -143,13 +150,14 @@ def publicar(cuentos, forzar):
     voz = os.environ["ELEVENLABS_VOICE_ID"]
     modelo = os.environ.get("ELEVENLABS_MODEL", "eleven_multilingual_v2")
     supa = Supabase(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SECRET_KEY"])
-    publicadas = supa.huellas()
+    publicados = supa.publicados()
 
     for c in cuentos:
         # La huella incluye voz y modelo: cambiar cualquiera de los dos regenera el audio.
         huella = hashlib.sha256(f"{voz}|{modelo}|{c['narracion']}".encode()).hexdigest()[:12]
         datos = {"titulo": c["titulo"], "descripcion": c["descripcion"], "orden": c["orden"]}
-        if publicadas.get(c["slug"]) == huella and not forzar:
+        anterior = publicados.pop(c["slug"], None)
+        if anterior and anterior["texto_hash"] == huella and not forzar:
             supa.actualizar(c["slug"], datos)
             print(f"  sin cambios   {c['slug']}")
             continue
@@ -164,7 +172,14 @@ def publicar(cuentos, forzar):
             "audio_url": url,
             "duracion_s": round(len(audio) * 8 / (KBPS * 1000)),
         })
+        if anterior and anterior["audio_url"] != url:
+            supa.borrar_audio(anterior["audio_url"])
         print(f"  publicado     {c['slug']}")
+
+    # La carpeta cuentos/ manda: lo que ya no tiene fichero se retira de la app.
+    for fila in publicados.values():
+        supa.borrar(fila)
+        print(f"  borrado       {fila['slug']}")
 
 
 def demo(cuentos):
