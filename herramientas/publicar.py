@@ -3,7 +3,7 @@
 
 Uso:
   python3 herramientas/publicar.py           publica los cuentos nuevos o modificados y retira los borrados
-  python3 herramientas/publicar.py --forzar  regenera el audio de todos
+  python3 herramientas/publicar.py --forzar  regenera todo el audio, sin reutilizar párrafos ya generados
   python3 herramientas/publicar.py --demo    prueba local con la voz del Mac (sin claves ni Supabase)
 """
 import argparse
@@ -22,6 +22,7 @@ import requests
 RAIZ = Path(__file__).resolve().parent.parent
 CUENTOS = RAIZ / "cuentos"
 DEMO = RAIZ / "app" / "demo"
+CACHE = RAIZ / ".cache" / "voz"  # audio de cada párrafo ya generado, para no volver a pagarlo
 BUCKET = "cuentos-audio"
 KBPS = 128
 HZ = 44100
@@ -99,12 +100,26 @@ def pedir_voz(cuerpo, clave, voz):
     sys.exit(f"ElevenLabs respondió {r.status_code}: {r.text[:300]}")
 
 
-def voz_elevenlabs(narracion, clave, voz, modelo):
+def parrafos_de(narracion):
+    return [p.strip() for p in re.split(r"\n\s*\n", narracion) if p.strip()]
+
+
+def ruta_cache(parrafo, voz, modelo):
+    return CACHE / (hashlib.sha256(f"{voz}|{modelo}|{parrafo}".encode()).hexdigest()[:20] + ".mp3")
+
+
+def voz_elevenlabs(narracion, clave, voz, modelo, forzar=False):
     # Cada párrafo se genera por separado y se une con un silencio fijo: el modelo por sí solo
     # apenas hace pausa en los puntos y aparte.
-    parrafos = [p.strip() for p in re.split(r"\n\s*\n", narracion) if p.strip()]
-    partes = []
+    # Los párrafos que no han cambiado se reutilizan de la caché local.
+    parrafos = parrafos_de(narracion)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    partes, nuevos = [], 0
     for i, parrafo in enumerate(parrafos):
+        guardado = ruta_cache(parrafo, voz, modelo)
+        if guardado.exists() and not forzar:
+            partes.append(guardado.read_bytes())
+            continue
         cuerpo = {
             "text": parrafo,
             "model_id": modelo,
@@ -116,8 +131,10 @@ def voz_elevenlabs(narracion, clave, voz, modelo):
         if i < len(parrafos) - 1:
             cuerpo["next_text"] = "\n\n".join(parrafos[i + 1:i + 4])[:500]
         partes.append(solo_audio(pedir_voz(cuerpo, clave, voz)))
+        guardado.write_bytes(partes[-1])
+        nuevos += 1
         print(f"\r    párrafo {i + 1}/{len(parrafos)}", end="", flush=True)
-    print()
+    print(f"\r    {nuevos} párrafos generados, {len(parrafos) - nuevos} reutilizados")
     return silencio(PAUSA).join(partes)
 
 
@@ -187,8 +204,8 @@ def publicar(cuentos, forzar):
             supa.actualizar(c["slug"], datos)
             print(f"  sin cambios   {c['slug']}")
             continue
-        print(f"  generando voz {c['slug']} ({len(c['narracion'])} caracteres)…")
-        audio = voz_elevenlabs(c["narracion"], os.environ["ELEVENLABS_API_KEY"], voz, modelo)
+        print(f"  generando voz {c['slug']}…")
+        audio = voz_elevenlabs(c["narracion"], os.environ["ELEVENLABS_API_KEY"], voz, modelo, forzar)
         url = supa.subir_audio(f"{c['slug']}-{huella}.mp3", audio)
         supa.guardar({
             **datos,
