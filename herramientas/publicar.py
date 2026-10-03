@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
 
 import requests
@@ -22,8 +23,10 @@ RAIZ = Path(__file__).resolve().parent.parent
 CUENTOS = RAIZ / "cuentos"
 DEMO = RAIZ / "app" / "demo"
 BUCKET = "cuentos-audio"
-MAX_TROZO = 4000  # caracteres por petición a ElevenLabs
 KBPS = 128
+HZ = 44100
+VELOCIDAD = 0.85  # 1.0 es la velocidad normal de la voz; ElevenLabs admite de 0.7 a 1.2
+PAUSA = 1.2  # segundos de silencio entre párrafos
 
 
 def cargar_env():
@@ -56,44 +59,66 @@ def leer_cuento(ruta):
     }
 
 
-def trocear(texto):
-    """Agrupa párrafos en trozos que caben en una petición."""
-    trozos, actual = [], ""
-    for parrafo in re.split(r"\n\s*\n", texto):
-        if actual and len(actual) + len(parrafo) > MAX_TROZO:
-            trozos.append(actual)
-            actual = ""
-        actual = f"{actual}\n\n{parrafo}" if actual else parrafo
-    if actual:
-        trozos.append(actual)
-    return trozos
+MARCO = 144 * KBPS * 1000 // HZ  # bytes por marco MP3
 
 
-def voz_elevenlabs(narracion, clave, voz, modelo):
-    trozos = trocear(narracion)
-    audio = b""
-    for i, trozo in enumerate(trozos):
-        cuerpo = {
-            "text": trozo,
-            "model_id": modelo,
-            "voice_settings": {"stability": 0.6, "similarity_boost": 0.8},
-        }
-        # El contexto de los trozos vecinos mantiene la entonación entre peticiones.
-        if i > 0:
-            cuerpo["previous_text"] = trozos[i - 1][-500:]
-        if i < len(trozos) - 1:
-            cuerpo["next_text"] = trozos[i + 1][:500]
+def solo_audio(mp3):
+    """Quita la etiqueta ID3 y el marco «Info» iniciales para poder encadenar varios MP3 en uno.
+
+    El marco «Info» declara la duración del fichero original; si se deja, los reproductores
+    creen que el audio unido dura lo que el primer trozo.
+    """
+    if mp3[:3] == b"ID3":
+        tam = (mp3[6] << 21) | (mp3[7] << 14) | (mp3[8] << 7) | mp3[9]
+        mp3 = mp3[10 + tam:]
+    if mp3[21:25] in (b"Info", b"Xing"):
+        mp3 = mp3[MARCO + ((mp3[2] >> 1) & 1):]
+    return mp3
+
+
+def silencio(segundos):
+    """Marcos MP3 mudos (mono, 44,1 kHz, 128 kbps): cabecera y el resto a cero."""
+    marco = b"\xff\xfb\x90\xc0".ljust(MARCO, b"\0")
+    return marco * round(segundos * HZ / 1152)
+
+
+def pedir_voz(cuerpo, clave, voz):
+    for intento in range(3):
         r = requests.post(
             f"https://api.elevenlabs.io/v1/text-to-speech/{voz}",
-            params={"output_format": f"mp3_44100_{KBPS}"},
+            params={"output_format": f"mp3_{HZ}_{KBPS}"},
             headers={"xi-api-key": clave},
             json=cuerpo,
             timeout=300,
         )
-        if not r.ok:
-            sys.exit(f"ElevenLabs respondió {r.status_code}: {r.text[:300]}")
-        audio += r.content
-    return audio
+        if r.ok:
+            return r.content
+        if r.status_code != 429 and r.status_code < 500:
+            break
+        time.sleep(5 * (intento + 1))
+    sys.exit(f"ElevenLabs respondió {r.status_code}: {r.text[:300]}")
+
+
+def voz_elevenlabs(narracion, clave, voz, modelo):
+    # Cada párrafo se genera por separado y se une con un silencio fijo: el modelo por sí solo
+    # apenas hace pausa en los puntos y aparte.
+    parrafos = [p.strip() for p in re.split(r"\n\s*\n", narracion) if p.strip()]
+    partes = []
+    for i, parrafo in enumerate(parrafos):
+        cuerpo = {
+            "text": parrafo,
+            "model_id": modelo,
+            "voice_settings": {"stability": 0.6, "similarity_boost": 0.8, "speed": VELOCIDAD},
+        }
+        # El contexto de los párrafos vecinos mantiene la entonación entre peticiones.
+        if i > 0:
+            cuerpo["previous_text"] = "\n\n".join(parrafos[max(0, i - 3):i])[-500:]
+        if i < len(parrafos) - 1:
+            cuerpo["next_text"] = "\n\n".join(parrafos[i + 1:i + 4])[:500]
+        partes.append(solo_audio(pedir_voz(cuerpo, clave, voz)))
+        print(f"\r    párrafo {i + 1}/{len(parrafos)}", end="", flush=True)
+    print()
+    return silencio(PAUSA).join(partes)
 
 
 class Supabase:
@@ -153,8 +178,9 @@ def publicar(cuentos, forzar):
     publicados = supa.publicados()
 
     for c in cuentos:
-        # La huella incluye voz y modelo: cambiar cualquiera de los dos regenera el audio.
-        huella = hashlib.sha256(f"{voz}|{modelo}|{c['narracion']}".encode()).hexdigest()[:12]
+        # La huella incluye los ajustes de voz: cambiar cualquiera de ellos regenera el audio.
+        ajustes = f"{voz}|{modelo}|{VELOCIDAD}|{PAUSA}"
+        huella = hashlib.sha256(f"{ajustes}|{c['narracion']}".encode()).hexdigest()[:12]
         datos = {"titulo": c["titulo"], "descripcion": c["descripcion"], "orden": c["orden"]}
         anterior = publicados.pop(c["slug"], None)
         if anterior and anterior["texto_hash"] == huella and not forzar:
