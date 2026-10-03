@@ -1,7 +1,7 @@
 ---
 titulo: El pez Ez - Piloto
 descripcion: Primer capítulo de las aventuras del pez Ez. Un pez de río descubre que hay que nadar contra la corriente y, en vez de huir del temible oso, decide hacerse su amigo.
-orden: 5
+orden: 1
 ---
 
 [softly, slow bedtime storytelling] Muy lejos de aquí, en una calle estrecha de una ciudad de Vietnam, hay una tienda de cerámica.
