@@ -4,3 +4,4 @@ __pycache__/
 app/demo/
 .claude/worktrees/
 .cache/
+.idea/

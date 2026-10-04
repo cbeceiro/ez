@@ -206,7 +206,9 @@ def publicar(cuentos, forzar):
             continue
         print(f"  generando voz {c['slug']}…")
         audio = voz_elevenlabs(c["narracion"], os.environ["ELEVENLABS_API_KEY"], voz, modelo, forzar)
-        url = supa.subir_audio(f"{c['slug']}-{huella}.mp3", audio)
+        # El nombre depende del contenido: un audio distinto estrena URL, y así ni la CDN ni la app
+        # siguen sirviendo la copia antigua que tienen guardada.
+        url = supa.subir_audio(f"{c['slug']}-{hashlib.sha256(audio).hexdigest()[:12]}.mp3", audio)
         supa.guardar({
             **datos,
             "slug": c["slug"],
