@@ -8,7 +8,7 @@ orden: 2
 
 [softly, slowly] Dentro del nido, cien huevos blancos y redondos esperaban en silencio. La arena los abrigaba como una manta. De día el sol la calentaba, y de noche guardaba ese calor, despacio, sin prisa.
 
-[gently, with tenderness] Una noche de verano, uno de los huevos se movió. Se abrió una grieta pequeña, y luego otra, y asomó una cabecita oscura. Era una tortuga diminuta, tan pequeña que habría cabido en la palma de una mano. Se llamaba Uga.
+[gently, with tenderness] Una noche de verano, uno de los huevos se movió. Se abrió una grieta pequeña, y luego otra, y asomó una cabeza oscura. Era una tortuga diminuta, tan pequeña que habría cabido en la palma de una mano. Se llamaba Uga.
 
 [softly, slowly] Uga todavía no sabía nada del mundo. Pero mientras descansaba en la arena, antes de salir, algo muy antiguo ocurrió dentro de ella.
 
@@ -16,7 +16,7 @@ orden: 2
 
 [measured, calm] En cada lugar del mundo, esos hilos son un poco distintos. En unos sitios tiran con más fuerza y en otros con menos. En unos sitios se inclinan mucho hacia el suelo y en otros apenas se inclinan. Cada playa tiene su propia manera de sentirse, igual que cada casa tiene su propio olor.
 
-[with quiet wonder, slowly] Y Uga, en la arena tibia, sintió cómo era la suya. La fuerza exacta. La inclinación exacta. Sin darse cuenta, lo guardó muy adentro, como quien guarda una dirección escrita en un papelito. Los sabios llaman a eso la impronta. Es la primera cosa que aprende una tortuga, y no la olvida nunca.
+[with quiet wonder, slowly] Y Uga, en la arena tibia, sintió cómo era la suya. La fuerza exacta. La inclinación exacta. Sin darse cuenta, lo guardó muy adentro, como quien guarda una dirección escrita en un papel doblado. Los biólogos lo llaman impronta. Es lo primero que aprende una tortuga, y no lo olvida nunca.
 
 [whispering] Esta es mi playa, decía aquel recuerdo sin palabras. [whispering, slowly] Aquí empecé.
 
@@ -34,7 +34,7 @@ orden: 2
 
 [softly, slowly] La corriente la llevó hasta un bosque flotante de algas doradas. Allí se quedó mucho tiempo. Las algas la escondían y la mecían. Entre sus hojas vivían cangrejos pequeños y peces del color del oro, y había comida de sobra. Uga comía, descansaba y crecía.
 
-[softly, slowly] Pasaron los días, y cada día se parecía al anterior. El sol salía por un lado del mar y se ponía por el otro. De noche, el agua se llenaba de lucecitas azules que se encendían cuando ella movía las aletas, como si nadara entre estrellas.
+[softly, slowly] Pasaron los días, y cada día se parecía al anterior. El sol salía por un lado del mar y se ponía por el otro. De noche, el agua se llenaba de pequeñas luces azules que se encendían cuando ella movía las aletas, como si nadara entre estrellas.
 
 [slowly, calm] Pasaron los años.
 
@@ -88,7 +88,7 @@ orden: 2
 
 [softly, slowly] Uga esperó a que se hiciera de noche. Cuando la luna estuvo alta, dejó que una ola la llevara hasta la orilla.
 
-[warmly, slowly] La arena era la misma arena. Tibia, fina, callada. Uga subió por la playa muy despacio, porque en tierra su cuerpo pesaba mucho. Una aleta, y luego la otra. Dejaba un rastro ancho, como el de un pequeño tractor. Una aleta, y luego la otra.
+[warmly, slowly] La arena era la misma arena. Tibia, fina, callada. Uga subió por la playa muy despacio, porque en tierra su cuerpo pesaba mucho. Una aleta, y luego la otra. Dejaba un rastro ancho y profundo, como el de algo que pesa mucho y no tiene prisa. Una aleta, y luego la otra.
 
 [softly, slowly] Llegó a la parte alta de la playa, donde no alcanzan las olas. Y allí, con las aletas de atrás, empezó a cavar. Sacaba la arena con cuidado, un puñado cada vez, hasta hacer un hueco hondo y redondo.
 
