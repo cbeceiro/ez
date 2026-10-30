@@ -1,10 +1,12 @@
+/* Paleta cálida y sin azules: se usa a oscuras, justo antes de dormir. */
 :root {
-  --fondo: #0b1026;
-  --panel: #151b3a;
-  --panel-activo: #1f2750;
-  --texto: #e9e6da;
-  --tenue: #8e93b3;
-  --acento: #f3dfa2;
+  --fondo: #0d0a08;
+  --panel: #18130f;
+  --panel-activo: #241c16;
+  --texto: #ece2d0;
+  --tenue: #8f8375;
+  --acento: #e6b26a;
+  --serif: ui-serif, "New York", "Iowan Old Style", Georgia, serif;
   color-scheme: dark;
 }
 
@@ -16,75 +18,135 @@ body {
   color: var(--texto);
   font: 17px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   min-height: 100dvh;
-  padding: calc(env(safe-area-inset-top) + 24px) 16px calc(env(safe-area-inset-bottom) + 24px);
+  padding: calc(env(safe-area-inset-top) + 28px) 16px calc(env(safe-area-inset-bottom) + 24px);
 }
 
-body.con-reproductor { padding-bottom: calc(env(safe-area-inset-bottom) + 330px); }
+body.con-mini { padding-bottom: calc(env(safe-area-inset-bottom) + 104px); }
+body.con-reproductor { overflow: hidden; }
 
 main { max-width: 560px; margin: 0 auto; }
 
-h1 { font-size: 28px; font-weight: 600; margin: 0 0 4px; letter-spacing: -0.01em; }
+h1 { font: 600 30px/1.15 var(--serif); margin: 0 0 4px; letter-spacing: -0.01em; }
 
 #estado { color: var(--tenue); font-size: 14px; margin: 0 0 16px; min-height: 1em; }
 
-#lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; padding: 0; }
 
-button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+svg.lleno { fill: currentColor; stroke: none; }
+
+.portada { display: block; border-radius: 12px; background: var(--panel-activo); flex: none; }
+
+/* Seguir escuchando */
+#continuar { margin-bottom: 28px; }
+#continuar h3 {
+  font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--tenue); margin: 0 0 10px;
+}
+.seguir {
+  width: 100%; text-align: left;
+  display: flex; gap: 16px; align-items: center;
+  background: var(--panel); border-radius: 20px; padding: 14px;
+}
+.seguir .portada { width: 88px; height: 88px; border-radius: 14px; }
+.seguir .info { flex: 1; min-width: 0; display: grid; gap: 6px; }
+.seguir strong { font: 600 20px/1.2 var(--serif); }
+.seguir small { color: var(--acento); font-size: 14px; }
+
+/* Lista */
+#lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 
 .cuento {
-  width: 100%;
-  text-align: left;
-  background: var(--panel);
-  border-radius: 16px;
-  padding: 16px 18px;
-  display: grid;
-  gap: 4px;
+  width: 100%; text-align: left;
+  display: flex; gap: 14px; align-items: flex-start;
+  border-radius: 16px; padding: 10px;
 }
-.cuento[aria-current="true"] { background: var(--panel-activo); outline: 1px solid var(--acento); }
-.cuento strong { font-weight: 600; font-size: 18px; }
-.cuento span { color: var(--tenue); font-size: 15px; }
-.cuento small { color: var(--acento); font-size: 13px; opacity: 0.85; }
+.cuento[aria-current="true"] { background: var(--panel); }
+.cuento .portada { width: 64px; height: 64px; }
+.cuento .info { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.cuento strong { font: 600 18px/1.25 var(--serif); }
+.cuento span { color: var(--tenue); font-size: 14px; line-height: 1.35; }
+.cuento small { color: var(--tenue); font-size: 13px; opacity: 0.85; }
+.cuento small .hecho { color: var(--acento); }
 
+.barra { height: 3px; border-radius: 2px; background: var(--panel-activo); overflow: hidden; margin-top: 4px; }
+.barra i { display: block; height: 100%; background: var(--acento); }
+
+/* Mini reproductor */
+#mini {
+  position: fixed; left: 12px; right: 12px;
+  bottom: calc(env(safe-area-inset-bottom) + 12px);
+  max-width: 536px; margin: 0 auto;
+  display: flex; align-items: center; gap: 12px;
+  background: var(--panel-activo); border-radius: 18px; padding: 10px 14px 10px 10px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+#mini[hidden] { display: none; }
+#mini-abrir { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; }
+#mini img { width: 48px; height: 48px; border-radius: 10px; }
+.mini-texto { flex: 1; min-width: 0; display: grid; }
+.mini-texto strong { font: 600 16px/1.3 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mini-texto small { color: var(--tenue); font-size: 13px; font-variant-numeric: tabular-nums; }
+.mini-play { width: 44px; height: 44px; display: grid; place-items: center; color: var(--acento); }
+.mini-play svg { width: 26px; height: 26px; }
+
+/* Reproductor a pantalla completa: modo noche */
 #reproductor {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  background: var(--panel);
-  border-radius: 24px 24px 0 0;
-  padding: 20px 20px calc(env(safe-area-inset-bottom) + 20px);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.5);
+  position: fixed; inset: 0;
+  background: #000;
+  display: flex; flex-direction: column;
+  padding: calc(env(safe-area-inset-top) + 8px) 24px calc(env(safe-area-inset-bottom) + 24px);
+  overflow-y: auto;
 }
-#reproductor > * { max-width: 520px; margin-left: auto; margin-right: auto; }
+#reproductor[hidden] { display: none; }
+#reproductor > * { width: 100%; max-width: 440px; margin-left: auto; margin-right: auto; }
 
-#titulo-actual { font-size: 18px; font-weight: 600; margin-top: 0; margin-bottom: 12px; text-align: center; }
+.cerrar { width: 48px; height: 48px; display: grid; place-items: center; color: var(--tenue); margin-left: -12px !important; }
+.cerrar svg { width: 28px; height: 28px; }
 
-#progreso { display: block; width: 100%; accent-color: var(--acento); height: 28px; }
+.escena { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; gap: 4px; padding: 12px 0; }
+#portada { width: min(64vw, 280px, 34dvh); aspect-ratio: 1; border-radius: 24px; margin-bottom: 20px; }
+#titulo-actual { font: 600 26px/1.2 var(--serif); margin: 0; }
+#desc-actual { color: var(--tenue); font-size: 15px; margin: 4px 0 0; }
+
+.mandos { display: grid; gap: 4px; }
+
+#progreso { display: block; width: 100%; accent-color: var(--acento); height: 28px; margin: 0; }
 
 .tiempos {
-  display: flex;
-  justify-content: space-between;
-  color: var(--tenue);
-  font-size: 13px;
-  font-variant-numeric: tabular-nums;
+  display: flex; justify-content: space-between;
+  color: var(--tenue); font-size: 13px; font-variant-numeric: tabular-nums;
 }
 
-.controles { display: flex; justify-content: center; align-items: center; gap: 28px; margin-top: 8px; margin-bottom: 16px; }
-.controles button {
-  width: 60px; height: 60px;
-  border-radius: 50%;
-  background: var(--panel-activo);
-  font-size: 17px;
-}
-.controles .principal { width: 80px; height: 80px; background: var(--acento); color: var(--fondo); font-size: 28px; }
+.controles { display: flex; justify-content: center; align-items: center; gap: 36px; margin: 12px 0 20px; }
+.controles button { width: 60px; height: 60px; border-radius: 50%; color: var(--tenue); position: relative; display: grid; place-items: center; }
+.controles button svg { width: 34px; height: 34px; stroke-width: 1.5; }
+.controles button span { position: absolute; font-size: 11px; font-weight: 600; }
+.controles .principal { width: 84px; height: 84px; background: var(--acento); color: #000; }
+.controles .principal svg { width: 34px; height: 34px; }
 
-#modos { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-#modos button {
-  background: var(--panel-activo);
-  color: var(--tenue);
-  border-radius: 999px;
-  padding: 10px 14px;
-  font-size: 14px;
-  min-height: 44px;
+.temporizador {
+  justify-self: center;
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--panel); color: var(--texto);
+  border-radius: 999px; padding: 10px 18px; min-height: 44px; font-size: 15px;
 }
-#modos button[aria-checked="true"] { background: var(--acento); color: var(--fondo); font-weight: 600; }
+.temporizador svg { width: 18px; height: 18px; color: var(--acento); }
 
-#aviso-temporizador { color: var(--tenue); font-size: 13px; text-align: center; margin-top: 10px; margin-bottom: 0; min-height: 1.4em; }
+#aviso-temporizador { color: var(--tenue); font-size: 13px; text-align: center; margin: 6px 0 0; min-height: 1.4em; }
+
+/* En reposo la pantalla se queda casi negra: solo el tiempo restante, en ámbar tenue. */
+#reposo {
+  position: absolute; inset: 0; margin: 0 !important; max-width: none !important;
+  display: grid; place-items: center;
+  color: var(--acento); opacity: 0; pointer-events: none;
+  font: 300 22px/1 var(--serif); font-variant-numeric: tabular-nums;
+  transition: opacity 3s ease;
+}
+#reproductor > :not(#reposo) { transition: opacity 3s ease; }
+#reproductor.en-reposo > :not(#reposo) { opacity: 0; pointer-events: none; }
+#reproductor.en-reposo #reposo { opacity: 0.35; }
+
+@media (prefers-reduced-motion: reduce) {
+  #reposo, #reproductor > :not(#reposo) { transition: none; }
+}

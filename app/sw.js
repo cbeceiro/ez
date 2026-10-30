@@ -1,4 +1,4 @@
-const SHELL = 'shell-v1';
+const SHELL = 'shell-v2';
 const AUDIO = 'audio-v1';
 const FICHEROS = [
   './', 'index.html', 'styles.css', 'app.js', 'config.js', 'manifest.webmanifest',

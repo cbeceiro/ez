@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0b1026">
+  <meta name="theme-color" content="#0d0a08">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Cuentos">
@@ -18,26 +18,49 @@
       <h1>Cuentos para dormir</h1>
       <p id="estado" role="status"></p>
     </header>
+    <section id="continuar" hidden aria-label="Seguir escuchando"></section>
     <ul id="lista"></ul>
   </main>
 
+  <div id="mini" hidden>
+    <button id="mini-abrir" aria-label="Abrir reproductor">
+      <img id="mini-portada" alt="">
+      <span class="mini-texto"><strong id="mini-titulo"></strong><small id="mini-tiempo"></small></span>
+    </button>
+    <button id="mini-play" class="mini-play" aria-label="Reproducir"></button>
+  </div>
+
   <section id="reproductor" hidden aria-label="Reproductor">
-    <h2 id="titulo-actual"></h2>
-    <input id="progreso" type="range" min="0" max="100" value="0" step="1" aria-label="Posición">
-    <div class="tiempos"><span id="transcurrido">0:00</span><span id="restante">0:00</span></div>
-    <div class="controles">
-      <button id="atras" aria-label="Retroceder 15 segundos">−15</button>
-      <button id="play" class="principal" aria-label="Reproducir">▶</button>
-      <button id="adelante" aria-label="Avanzar 15 segundos">+15</button>
+    <button id="cerrar" class="cerrar" aria-label="Volver a la lista">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </button>
+
+    <div class="escena">
+      <img id="portada" alt="">
+      <h2 id="titulo-actual"></h2>
+      <p id="desc-actual"></p>
     </div>
-    <div id="modos" role="radiogroup" aria-label="Cuándo parar">
-      <button data-modo="fin">Fin del cuento</button>
-      <button data-modo="15">15 min</button>
-      <button data-modo="30">30 min</button>
-      <button data-modo="45">45 min</button>
-      <button data-modo="seguido">Sin parar</button>
+
+    <div class="mandos">
+      <input id="progreso" type="range" min="0" max="100" value="0" step="1" aria-label="Posición">
+      <div class="tiempos"><span id="transcurrido">0:00</span><span id="restante">0:00</span></div>
+      <div class="controles">
+        <button id="atras" aria-label="Retroceder 15 segundos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4h4"/></svg><span>15</span>
+        </button>
+        <button id="play" class="principal" aria-label="Reproducir"></button>
+        <button id="adelante" aria-label="Avanzar 15 segundos">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v4h-4"/></svg><span>15</span>
+        </button>
+      </div>
+      <button id="temporizador" class="temporizador">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+        <span id="modo-texto"></span>
+      </button>
+      <p id="aviso-temporizador"></p>
     </div>
-    <p id="aviso-temporizador"></p>
+
+    <p id="reposo" aria-hidden="true"></p>
   </section>
 
   <audio id="audio" preload="metadata" crossorigin="anonymous"></audio>
